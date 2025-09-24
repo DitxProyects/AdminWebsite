@@ -353,13 +353,13 @@
         <form id="addUserForm">
           <div class="form-group">
             <label for="username" class="label">Username</label>
-            <input type="text" id="username" class="form-control" placeholder="Enter username" required>
+            <input type="text" id="loal" class="form-control" placeholder="Enter username" required>
           </div>
           
           <div class="form-group">
             <label for="password" class="label">Password</label>
             <div class="password-container">
-              <input type="password" id="password" class="form-control" placeholder="Enter password" required>
+              <input type="password" id="ll" class="form-control" placeholder="Enter password" required>
               <button type="button" class="btn btn-icon toggle-password">
                 <i class="fas fa-eye"></i>
               </button>
@@ -374,7 +374,7 @@
           <div class="form-group">
             <label class="label">Status</label>
             <div class="form-check">
-              <input type="checkbox" id="statusCheckbox" class="form-check-input">
+              <input type="checkbox" id="juka" class="form-check-input">
               <label for="statusCheckbox" class="form-check-label">Active User</label>
             </div>
           </div>
@@ -469,17 +469,19 @@
       const now = new Date();
       const rgtime = `${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
 
-      const userRef = ref(db, `userinfo/${username}`);
-      set(userRef, {
-        username: username,
-        password: password,
-        status: status,
-        validity: formattedDate,
-        access: access,
-        device: 'null',
-        rgtime: rgtime,
-        credit: credit
-      }).then(() => {
+      const usuariosRef = ref(db, 'Usuarios');
+const newUserRef = push(usuariosRef); 
+      set(newUserRef, {
+  loal: username.toUpperCase(),    // ← Campo que busca el login
+  ll: password.toUpperCase(),      // ← Campo que busca el login  
+  juka: isActive ? "true" : "false", // ← Campo que busca el login (string)
+  Acessos: access,                 // ← Campo que busca el login
+  Validade: formattedDate,         // ← Campo que busca el login
+  Key: newUserRef.key,             // ← Campo que busca el login
+  // Campos opcionales que el login espera:
+  UID1: "",  // Se llenará automáticamente
+  UID2: ""   // Se llenará automáticamente
+}).then(() => {
         showResult('User added successfully!', 'success');
         addUserForm.reset();
       }).catch((error) => {
