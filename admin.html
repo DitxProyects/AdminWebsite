@@ -204,11 +204,11 @@
       box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
     }
 
-    .ll-container {
+    .password-container {
       position: relative;
     }
 
-    .toggle-ll {
+    .toggle-password {
       position: absolute;
       right: 10px;
       top: 50%;
@@ -352,15 +352,15 @@
       <div class="card">
         <form id="addUserForm">
           <div class="form-group">
-            <label for="loal" class="label">loal</label>
-            <input type="text" id="loal" class="form-control" placeholder="Enter Username" required>
+            <label for="username" class="label">Username</label>
+            <input type="text" id="username" class="form-control" placeholder="Enter username" required>
           </div>
           
           <div class="form-group">
-            <label for="ll" class="label">ll</label>
-            <div class="ll-container">
-              <input type="ll" id="ll" class="form-control" placeholder="Enter Password" required>
-              <button type="button" class="btn btn-icon toggle-ll">
+            <label for="password" class="label">Password</label>
+            <div class="password-container">
+              <input type="password" id="password" class="form-control" placeholder="Enter password" required>
+              <button type="button" class="btn btn-icon toggle-password">
                 <i class="fas fa-eye"></i>
               </button>
             </div>
@@ -374,7 +374,7 @@
           <div class="form-group">
             <label class="label">Status</label>
             <div class="form-check">
-              <input type="checkbox" id="juka" class="form-check-input">
+              <input type="checkbox" id="statusCheckbox" class="form-check-input">
               <label for="statusCheckbox" class="form-check-label">Active User</label>
             </div>
           </div>
@@ -425,18 +425,18 @@
       mainContent.classList.toggle('full-width');
     });
 
-    // Toggle ll visibility
-    const togglell = document.querySelector('.toggle-ll');
-    const llInput = document.getElementById('ll');
+    // Toggle password visibility
+    const togglePassword = document.querySelector('.toggle-password');
+    const passwordInput = document.getElementById('password');
 
-    togglell.addEventListener('click', () => {
-      const icon = togglell.querySelector('i');
-      if (llInput.type === 'll') {
-        llInput.type = 'text';
+    togglePassword.addEventListener('click', () => {
+      const icon = togglePassword.querySelector('i');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
         icon.classList.remove('fa-eye');
         icon.classList.add('fa-eye-slash');
       } else {
-        llInput.type = 'll';
+        passwordInput.type = 'password';
         icon.classList.remove('fa-eye-slash');
         icon.classList.add('fa-eye');
       }
@@ -449,15 +449,15 @@
     addUserForm.addEventListener('submit', (e) => {
       e.preventDefault();
       
-      const loal = document.getElementById('loal').value.trim();
-      const ll = document.getElementById('ll').value.trim();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
       const validity = document.getElementById('validity').value;
       const isActive = document.getElementById('statusCheckbox').checked;
       const credit = document.getElementById('credit').value;
       const access = document.querySelector('input[name="access"]:checked').value;
       const status = isActive ? 'active' : 'inactive';
       
-      if (!loal || !ll || !validity) {
+      if (!username || !password || !validity) {
         showResult('Please fill all fields', 'error');
         return;
       }
@@ -469,19 +469,17 @@
       const now = new Date();
       const rgtime = `${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
 
-      const usuariosRef = ref(db, 'Usuarios');
-const newUserRef = push(usuariosRef); 
-      set(newUserRef, {
-  loal: loal.toUpperCase(),    // ← Campo que busca el login
-  ll: ll.toUpperCase(),      // ← Campo que busca el login  
-  juka: isActive ? "true" : "false", // ← Campo que busca el login (string)
-  Acessos: access,                 // ← Campo que busca el login
-  Validade: formattedDate,         // ← Campo que busca el login
-  Key: newUserRef.key,             // ← Campo que busca el login
-  // Campos opcionales que el login espera:
-  UID1: "",  // Se llenará automáticamente
-  UID2: ""   // Se llenará automáticamente
-}).then(() => {
+      const userRef = ref(db, `userinfo/${username}`);
+      set(userRef, {
+        username: username,
+        password: password,
+        status: status,
+        validity: formattedDate,
+        access: access,
+        device: 'null',
+        rgtime: rgtime,
+        credit: credit
+      }).then(() => {
         showResult('User added successfully!', 'success');
         addUserForm.reset();
       }).catch((error) => {

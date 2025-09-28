@@ -351,15 +351,15 @@
       margin-bottom: 5px;
     }
 
-    .ll-container {
+    .password-container {
       position: relative;
     }
 
-    .ll-container input {
+    .password-container input {
       padding-right: 35px;
     }
 
-    .toggle-ll {
+    .toggle-password {
       position: absolute;
       right: 10px;
       top: 50%;
@@ -650,12 +650,12 @@
       }
 
       userListEl.innerHTML = '';
-      Object.entries(users).forEach(([loal, user]) => {
+      Object.entries(users).forEach(([username, user]) => {
         const userCard = document.createElement('div');
         userCard.className = 'user-card';
         userCard.innerHTML = `
           <div class="user-header">
-            <h3>${loal}</h3>
+            <h3>${username}</h3>
             <span class="user-status ${user.status}">
               <i class="fas fa-circle"></i> ${user.status}
             </span>
@@ -663,10 +663,10 @@
           
           <div class="user-details">
             <div class="detail-group">
-              <label>ll</label>
-              <div class="ll-container">
-                <input type="ll" id="ll-${loal}" value="${user.ll || ''}" class="form-control">
-                <button class="btn btn-icon toggle-ll" onclick="togglellVisibility('ll-${loal}', this)">
+              <label>Password</label>
+              <div class="password-container">
+                <input type="password" id="password-${username}" value="${user.password || ''}" class="form-control">
+                <button class="btn btn-icon toggle-password" onclick="togglePasswordVisibility('password-${username}', this)">
                   <i class="fas fa-eye"></i>
                 </button>
               </div>
@@ -674,7 +674,7 @@
             
             <div class="detail-group">
               <label>Status</label>
-              <select id="status-${loal}" class="form-control">
+              <select id="status-${username}" class="form-control">
                 <option value="active" ${user.status === 'active' ? 'selected' : ''}>Active</option>
                 <option value="inactive" ${user.status === 'inactive' ? 'selected' : ''}>Inactive</option>
               </select>
@@ -682,12 +682,12 @@
             
             <div class="detail-group">
               <label>Valid Until</label>
-              <input type="text" id="validity-${loal}" value="${user.validity || ''}" class="form-control">
+              <input type="text" id="validity-${username}" value="${user.validity || ''}" class="form-control">
             </div>
             
             <div class="detail-group">
               <label>Access</label>
-              <select id="access-${loal}" class="form-control">
+              <select id="access-${username}" class="form-control">
                 <option value="1" ${user.access === '1' ? 'selected' : ''}>1 Device</option>
                 <option value="∞" ${user.access === '∞' ? 'selected' : ''}>Unlimited Devices</option>
               </select>
@@ -695,7 +695,7 @@
             
             <div class="detail-group">
               <label>Seller's Credit</label>
-              <select id="credit-${loal}" class="form-control">
+              <select id="credit-${username}" class="form-control">
                 <option value="10" ${user.credit == '10' ? 'selected' : ''}>10 Credits</option>
                 <option value="20" ${user.credit == '20' ? 'selected' : ''}>20 Credits</option>
                 <option value="30" ${user.credit == '30' ? 'selected' : ''}>30 Credits</option>
@@ -708,10 +708,10 @@
           </div>
           
           <div class="user-actions">
-            <button class="btn btn-success" onclick="updateUser('${loal}')">
+            <button class="btn btn-success" onclick="updateUser('${username}')">
               <i class="fas fa-save"></i> Update
             </button>
-            <button class="btn btn-danger" onclick="deleteUser('${loal}')">
+            <button class="btn btn-danger" onclick="deleteUser('${username}')">
               <i class="fas fa-trash"></i> Delete
             </button>
           </div>
@@ -739,21 +739,21 @@
       document.getElementById('inactiveUsers').textContent = inactive;
     }
 
-    window.togglellVisibility = function(inputId, btn) {
+    window.togglePasswordVisibility = function(inputId, btn) {
       const input = document.getElementById(inputId);
       const icon = btn.querySelector('i');
-      if (input.type === 'll') {
+      if (input.type === 'password') {
         input.type = 'text';
         icon.classList.remove('fa-eye');
         icon.classList.add('fa-eye-slash');
       } else {
-        input.type = 'll';
+        input.type = 'password';
         icon.classList.remove('fa-eye-slash');
         icon.classList.add('fa-eye');
       }
     };
 
-    window.updateUser = function(loal) {
+    window.updateUser = function(username) {
       // Disable updates if in maintenance mode
       const settingsRef = ref(db, 'settings/maintenanceMode');
       get(settingsRef).then(snapshot => {
@@ -762,23 +762,23 @@
           return;
         }
 
-        const ll = document.getElementById(`ll-${loal}`).value;
-        const status = document.getElementById(`status-${loal}`).value;
-        const validity = document.getElementById(`validity-${loal}`).value;
-        const access = document.getElementById(`access-${loal}`).value;
-        const credit = document.getElementById(`credit-${loal}`).value;
+        const password = document.getElementById(`password-${username}`).value;
+        const status = document.getElementById(`status-${username}`).value;
+        const validity = document.getElementById(`validity-${username}`).value;
+        const access = document.getElementById(`access-${username}`).value;
+        const credit = document.getElementById(`credit-${username}`).value;
 
-        update(ref(db, `userinfo/${loal}`), {
-          ll,
+        update(ref(db, `userinfo/${username}`), {
+          password,
           status,
           validity,
           access,
           credit
         }).then(() => {
-          showAlert(`User ${loal} updated successfully!`, 'success');
-          allUsers[loal] = {
-            ...allUsers[loal],
-            ll,
+          showAlert(`User ${username} updated successfully!`, 'success');
+          allUsers[username] = {
+            ...allUsers[username],
+            password,
             status,
             validity,
             access
@@ -790,7 +790,7 @@
       });
     };
 
-    window.deleteUser = function(loal) {
+    window.deleteUser = function(username) {
       // Disable deletions if in maintenance mode
       const settingsRef = ref(db, 'settings/maintenanceMode');
       get(settingsRef).then(snapshot => {
@@ -799,10 +799,10 @@
           return;
         }
 
-        if (confirm(`Are you sure you want to delete ${loal}? This action cannot be undone.`)) {
-          remove(ref(db, `userinfo/${loal}`)).then(() => {
-            showAlert(`User ${loal} deleted successfully!`, 'success');
-            delete allUsers[loal];
+        if (confirm(`Are you sure you want to delete ${username}? This action cannot be undone.`)) {
+          remove(ref(db, `userinfo/${username}`)).then(() => {
+            showAlert(`User ${username} deleted successfully!`, 'success');
+            delete allUsers[username];
             renderUsers(allUsers);
             updateStats(allUsers);
           }).catch((error) => {
